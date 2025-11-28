@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pierce 的拼字大冒險 v3.1 (修正版)</title>
+    <title>Allen 的拼字大冒險</title>
     <style>
         /* --- 基礎 CSS --- */
         :root {
@@ -109,7 +109,7 @@
             <span>🔥 連對: <span id="streak-count">0</span></span>
         </div>
         <div>
-            <button class="btn-shop" onclick="toggleShop()">🏪 冒險商城</button>
+            <button class="btn-shop" onclick="toggleShop()">🏪 Allen 的冒險商城</button>
             <button class="btn-secondary" onclick="toggleRules()">📜</button>
         </div>
     </div>
@@ -155,7 +155,7 @@
     <div id="shop-modal" class="modal">
         <div class="modal-content" style="max-width: 700px;">
             <span class="close-btn" onclick="toggleShop()">&times;</span>
-            <h2 style="text-align: center;">🏪 Pierce 的冒險商城</h2>
+            <h2 style="text-align: center;">🏪 Allen 的冒險商城</h2>
             <div style="text-align: center; margin-bottom: 10px;">持有金幣: <b id="shop-coins" style="color: gold; font-size: 1.2em;"></b></div>
 
             <div class="shop-tabs">
@@ -197,27 +197,156 @@
     </div>
 
     <script>
-        // 用 try-catch 包裹以偵測錯誤
         try {
-            // --- 1. 資料庫 (單字與商品) ---
+            // --- 1. 資料庫 (Allen 的專屬單字庫) ---
             const wordList = {
-                'Week 1': [['bank','銀行'],['camp','露營'],['hand','手'],['paint','油漆'],['plant','植物'],['pond','池塘'],['pump','幫浦'],['stamp','郵票'],['stand','站立'],['stump','樹樁'],['wind','風'],['wink','眨眼'],['hungry','飢餓的'],['lapping','舔、拍打(水)'],['milk','牛奶'],['quiet','安靜的'],['television','電視'],['backyard','後院'],['basement','地下室'],['clean','打掃'],['fly up','飛起來'],['keep-away','躲避遊戲'],['near','近的'],['upstairs','樓上']],
-                'Week 2': [['belt','皮帶'],['elf','小精靈'],['gift','禮物'],['golf','高爾夫'],['left','左邊'],['lift','提起'],['melt','融化'],['quilt','棉被'],['raft','木筏'],['shelf','架子'],['wilt','枯萎'],['wolf','狼'],['came','來了'],['bait','餌'],['rake','耙子'],['hay','乾草'],['plate','盤子'],['pail','水桶'],['cane','拐杖'],['raise','舉起'],['grape','葡萄'],['say','說'],['aid','幫助'],['pain','疼痛'],['trail','小徑'],['stain','汙漬'],['blaze','火焰'],['almost','幾乎'],['dishes','盤子'],['everyone','每個人'],['family','家人'],['later','之後'],['soup','湯'],['still','仍然'],['together','一起'],['window','窗戶'],['children','孩子們'],['collar','領子'],['heel','腳跟'],['hurt','受傷'],['in front of','在…前面'],['lean','傾斜'],['pet store','寵物店'],['snort','噴鼻息']],
-                'Week 3': [['scrape','刮'],['scratch','抓'],['screen','螢幕'],['scrub','用力擦'],['splash','濺起'],['split','分開'],['sprain','扭傷'],['spray','噴灑'],['spring','春天/彈簧'],['strap','皮帶'],['stripes','條紋'],['strong','強壯的'],['deep','深的'],['meal','一餐'],['sheep','羊'],['each','每一個'],['wheel','輪子'],['treat','招待'],['bean','豆子'],['seen','看見'],['team','團隊'],['dream','夢'],['mean','意思是'],['leave','離開'],['cream','奶油'],['sleep','睡覺'],['sneeze','打噴嚏'],['copies','副本'],['enough','足夠'],['library','圖書館'],['number','數字'],['prizes','獎品'],['ribbon','緞帶'],['ring','戒指'],['rope','繩子'],['sign','標誌'],['tonight','今晚'],['happen','發生'],['miss','想念'],['nice','好的'],['steps','階梯'],['terrible','可怕的']],
-                'Week 4': [['knee','膝蓋'],['kneel','跪下'],['knife','刀'],['knit','編織'],['knob','圓形把手'],['knock','敲'],['knot','結'],['wrap','包起來'],['wreath','花圈'],['wrench','扳手'],['wrist','手腕'],['write','寫'],['wrong','錯的'],['shy','害羞的'],['right','正確的/右邊'],['wide','寬的'],['light','光/輕的'],['pine','松樹'],['fight','打架'],['fly','飛'],['night','夜晚'],['dry','乾的'],['sight','視線'],['might','可能'],['tight','緊的'],['stripe','條紋'],['sly','狡猾的'],['cry','哭'],['basket','籃子'],['bend down','彎下'],['kind','親切的/種類'],['wave','揮手/波浪'],['enter','進入'],['never','從不'],['picture','圖片'],['proud','驕傲的'],['shiny','閃亮的'],['spray','噴灑']],
-                'Week 5': [['brick','磚'],['check','檢查'],['chick','小雞'],['clock','時鐘'],['duck','鴨子'],['lock','鎖'],['pocket','口袋'],['rack','架子'],['rock','岩石'],['rocket','火箭'],['snack','點心'],['thick','厚'],['track','軌道'],['poke','戳'],['boat','船'],['row','划船'],['goat','山羊'],['snow','雪'],['toad','蟾蜍'],['soap','肥皂'],['blow','吹'],['coat','外套'],['tow','拖拉'],['coach','教練'],['float','漂浮'],['toast','吐司'],['slow','慢的'],['globe','地球'],['at once','立刻'],['dog toys','狗玩具'],['guess','猜'],['inside','裡面'],['judge','評判'],['place','地方']],
-                'Week 6': [['bright','明亮的'],['caught','抓到'],['eight','八'],['flight','飛行'],['high','高的'],['knight','騎士'],['light','光'],['night','夜晚'],['right','正確的'],['sign','標誌'],['sight','視力'],['straight','直的'],['tight','緊的'],['tune','曲子'],['moon','月亮'],['pool','游泳池'],['zoo','動物園'],['rude','粗魯的'],['soon','很快'],['boot','長靴'],['food','食物'],['tube','管子'],['room','房間'],['moose','麋鹿'],['goose','鵝'],['zoom','嗖地飛'],['balloon','氣球'],['shoot','射擊'],['a can of','一罐'],['enter','進入'],['first','第一'],['glitter','閃光'],['gold','金子'],['prizes','獎品'],['second','第二'],['sign up','報名'],['surely','當然'],['third','第三'],['look at','看著'],['no cost','免費'],['nod','點頭'],['paste','黏貼'],['permission','許可']],
-                'Week 7': [['basement','地下室'],['bright-eyed','眼神明亮的'],['lean','傾斜'],['past','過去'],['wrong','錯的'],['remember','記得'],['clap','拍手'],['crowd','人群'],['hug','擁抱'],['nervous','緊張的'],['people','人們'],['ring','戒指 / 鈴聲']],
-                'Week 8': [['different','不同的'],['hold up','舉起'],['lay down','躺下'],['other','其他的'],['racehorse','賽馬'],['win','贏'],['winner','勝利者']],
-                'Week 9': [['what','什麼'],['clash','衝突'],['shock','震驚'],['while','當…時'],['shame','可惜'],['flash','閃光'],['where','哪裡'],['shine','發亮'],['why','為什麼'],['shore','海岸'],['shall','將要'],['share','分享'],['shadow','影子'],['whisper','低語'],['whiskers','鬍鬚'],['different','不同的'],['hold up','舉起'],['lay down','躺下'],['other','其他的'],['racehorse','賽馬'],['win','贏'],['winner','優勝者'],['braid','辮子'],['chain','鍊條'],['hay','乾草'],['mail','郵件'],['pail','水桶'],['paint','油漆'],['pay','付錢'],['rain','雨'],['sail','帆 / 航行'],['stain','汙漬'],['train','火車'],['tray','托盤'],['beads','珠子'],['bean','豆子'],['beef','牛肉'],['bread','麵包'],['head','頭'],['heel','腳跟'],['leaf','葉子'],['screen','螢幕'],['seat','座位'],['steam','蒸氣'],['thread','線'],['tree','樹'],['climb','爬'],['myself','我自己'],['practice','練習'],['track','軌道'],['uncle','叔叔'],['whiskers','鬍鬚']],
-                'Week 10': [['braid','辮子'],['chain','鍊條'],['hay','乾草'],['nail','指甲 / 釘子'],['pail','水桶'],['paint','油漆'],['pay','付錢'],['rain','雨'],['sail','航行'],['stain','汙點'],['beads','珠子'],['bean','豆子'],['beef','牛肉'],['bead','珠子'],['head','頭'],['heel','腳跟'],['leaf','葉子'],['screen','螢幕'],['seat','座位'],['steam','蒸氣'],['thread','線'],['tree','樹'],['climb','爬'],['myself','我自己'],['practice','練習'],['track','軌道'],['uncle','叔叔'],['whiskers','鬍鬚'],['wrote','寫了'],['clover','酢漿草'],['danger','危險'],['field','田野'],['noise','噪音'],['pass','經過'],['rest','休息'],['rumble','隆隆聲'],['sky','天空'],['thunder','雷']],
-                'Week 11': [['blow','吹'],['bowl','碗'],['crow','烏鴉'],['goat','山羊'],['pillow','枕頭'],['road','道路'],['snow','雪'],['soap','肥皂'],['throw','丟'],['toad','蟾蜍'],['toast','吐司'],['window','窗戶'],['bath','洗澡'],['peach','桃子'],['tooth','牙齒'],['thin','瘦的'],['choke','噎到'],['much','很多'],['with','和'],['chick','小雞'],['teach','教'],['thank','感謝'],['child','小孩'],['chore','家事'],['reach','到達'],['thick','厚'],['think','思考'],['carrot','胡蘿蔔'],['cool','涼的'],['gloves','手套'],['haircut','理髮'],['patch','補丁'],['pond','池塘'],['spring','春天'],['voice','聲音'],['wool','羊毛'],['acorn','橡子'],['angry','生氣的'],['as fast as','盡可能快'],['bless','祝福'],['chattering','喋喋不休'],['dig','挖'],['hill','小山'],['oak','橡樹'],['squirrel','松鼠'],['thief','小偷'],['tiny','很小的']],
-                'Week 12': [['boot','長靴'],['cook','煮'],['hood','帽兜'],['hook','鉤子'],['hoop','圈'],['moose','麋鹿'],['pool','游泳池'],['school','學校'],['shook','搖動'],['spoon','湯匙'],['stood','站立'],['stool','凳子'],['cause','原因'],['claw','爪'],['crawl','爬行'],['draw','畫'],['faucet','水龍頭'],['fawn','小鹿'],['laundry','洗衣'],['paw','爪子'],['sauce','醬汁'],['shawl','披巾'],['straw','吸管 / 稻草'],['yawn','打哈欠'],['behind','在後面'],['berry','漿果'],['branches','樹枝'],['bushy tail','毛茸茸的尾巴'],['dance','跳舞'],['flag','旗子'],['insect','昆蟲'],['quick','快的'],['skunk','臭鼬'],['suddenly','突然地']],
-                'Week 13': [['blew','吹了'],['chew','咀嚼'],['dew','露水'],['few','少數'],['flew','飛了'],['grew','成長'],['jewelry','珠寶'],['mew','貓叫'],['new','新的'],['screw','螺絲'],['stew','燉菜'],['threw','丟了'],['art','藝術'],['yard','院子'],['barn','穀倉'],['park','公園'],['hard','困難的'],['cart','手推車'],['dark','黑暗'],['farm','農場'],['shark','鯊魚'],['sharp','銳利的'],['harm','傷害'],['alarm','鬧鐘'],['arms','手臂'],['march','三月 / 行進'],['smart','聰明的'],['buzzing','嗡嗡聲'],['careful','小心的'],['fur','毛'],['hit','打'],['hole','洞'],['honey','蜂蜜'],['lick','舔'],['path','小路'],['sting','螫'],['stuck','卡住的'],['against','反對'],['hardly','幾乎不'],['meadow','草地'],['middle','中間'],['pit-pat','噠噠聲'],['space','空間'],['toss','丟'],['touch','觸碰'],['whistle','口哨']],
-                'Week 15': [['baby','嬰兒'],['bunny','小兔子'],['city','城市'],['cry','哭'],['dry','乾的'],['fly','飛'],['fry','炸'],['happy','快樂的'],['party','派對'],['pony','小馬'],['silly','傻的'],['sky','天空'],['story','故事'],['chain','鏈子'],['chop','切'],['shed','棚子'],['shelf','架子'],['thick','厚'],['thin','瘦的'],['think','思考'],['thread','線'],['three','三'],['throat','喉嚨'],['whale','鯨魚'],['wheel','輪子'],['shines','發光'],['through','穿過'],['bouncing','彈跳的'],['spider','蜘蛛'],['webs','網'],['woods','樹林'],['glass','玻璃'],['tied together','綁在一起'],['drop','掉下'],['straight','直的'],['friendly','友善的'],['bless','祝福'],['blink','眨眼'],['crawl','爬'],['flat','平的'],['follow','跟隨'],['join','加入'],['rock','岩石'],['star','星星'],['swish','唰地一聲']],
-                'Week 16': [['bath','洗澡'],['bench','長凳'],['branch','樹枝'],['brush','刷子'],['dish','盤子'],['ditch','溝渠'],['path','小徑'],['ring','戒指'],['swing','盪鞦韆'],['switch','開關'],['teeth','牙齒'],['watch','手錶'],['bird','鳥'],['more','更多'],['shirt','襯衫'],['horse','馬'],['first','第一'],['for','為了'],['girl','女孩'],['horn','角'],['dirt','泥土'],['short','短的'],['store','商店'],['morning','早晨'],['dinosaur','恐龍'],['third','第三'],['whirl','旋轉'],['appear','出現'],['decide','決定'],['furry','毛茸茸的'],['sister','姐妹'],['strange','奇怪的'],['tease','取笑']],
-                'Week 17': [['barn','穀倉'],['card','卡片'],['dart','飛鏢'],['fern','蕨類'],['harp','豎琴'],['ladder','梯子'],['letter','信'],['number','數字'],['paper','紙'],['shark','鯊魚'],['slipper','拖鞋'],['water','水'],['yard','院子'],['flutter','拍動'],['flyer','傳單'],['minute','分鐘'],['nearby','附近'],['reach','到達'],['seem','似乎'],['throat','喉嚨'],['hummingbird','蜂鳥'],['afraid','害怕'],['exclaimed','驚呼'],['frightened','害怕的'],['lift','抬起'],['shut','關上'],['stretch','伸展'],['wide','寬的']],
-                'Week 18': [['cork','軟木塞'],['corn','玉米'],['dirt','泥土'],['fork','叉子'],['horn','角'],['shirt','襯衫'],['short','短的'],['skirt','裙子'],['squirt','噴出'],['stir','攪拌'],['storm','暴風雨'],['third','第三'],['thorn','荊棘'],['burn','燒'],['curb','路邊'],['curl','捲曲'],['fur','毛'],['hurt','受傷'],['turn','轉彎'],['does','做(3rd)'],['were','是(過去)'],['every','每個'],['very','非常'],['give','給'],['live','生活'],['thing','東西'],['your','你的'],['many','許多'],['who','誰'],['any','任何'],['away','離開'],['goes','去(3rd)'],['find','找到'],['kind','種類/好的'],['ago','以前'],['another','另一個'],['corner','角落'],['everywhere','到處'],['fold','摺'],['important','重要的'],['mouse','老鼠'],['neck','脖子'],['owl','貓頭鷹'],['sharp','銳利的'],['size','尺寸'],['supper','晚餐'],['argue','爭吵'],['bright','明亮的'],['button','鈕扣'],['chuckle','輕笑'],['ladybug','瓢蟲'],['prettiest','最漂亮的'],['shout','叫喊'],['spots','斑點'],['whole','整個的']]
+                'Week 1': [
+                    ['supper', '晚餐'], ['curved', '彎曲的'], ['purse', '錢包'], ['third', '第三'], ['porch', '門廊'],
+                    ['circle', '圓形'], ['sharp', '銳利的'], ['hurt', '受傷'], ['alarm', '鬧鐘'], ['birthday', '生日'],
+                    ['camera', '相機'], ['barber', '理髮師'], ['burst', '爆開'], ['person', '人'], ['carve', '雕刻'],
+                    ['herd', '畜群'], ['turtle', '烏龜'], ['before', '之前'], ['driver', '駕駛'], ['orange', '橘子'],
+                    ['river', '河流'], ['harp', '豎琴'], ['forest', '森林'], ['earthworm', '蚯蚓'], ['pearl', '珍珠'],
+                    ['world', '世界'], ['serve', '服務'], ['birth', '出生'], ['further', '更進一步'], ['fern', '蕨類植物'],
+                    ['early', '早的'], ['thirst', '口渴'], ['urge', '催促'], ['term', '學期'], ['learn', '學習'],
+                    ['word', '單字'], ['twirl', '旋轉'], ['worth', '價值'], ['heard', '聽到'], ['worst', '最糟的'],
+                    ['urgent', '緊急的'], ['perfect', '完美的'], ['purpose', '目的'], ['overheard', '無意中聽到'], ['search', '搜尋'],
+                    ['earnest', '認真的'], ['cartoon', '卡通'], ['postmarked', '郵戳的'], ['California', '加州'], ['eagerly', '熱切地'],
+                    ['grandparents', '祖父母'], ['workroom', '工作室'], ['storyboard', '分鏡圖'], ['basic', '基本的'], ['exaggerated', '誇張的'],
+                    ['fewer', '較少的'], ['awkward', '尷尬的'], ['lip motions', '嘴唇動作'], ['character', '角色'], ['actions', '行動'],
+                    ['slamming', '用力關上'], ['talent', '才能'], ['souvenir', '紀念品'], ['environment', '環境'], ['issues', '議題'],
+                    ['participate', '參加'], ['research', '研究'], ['surroundings', '周圍'], ['trust', '信任']
+                ],
+                'Week 2': [
+                    ['mounds', '小丘'], ['towns', '城鎮'], ['mountain', '山'], ['howl', '嗥叫'], ['powder', '粉末'],
+                    ['tower', '塔'], ['poison', '毒藥'], ['couch', '沙發'], ['allow', '允許'], ['shower', '淋浴'],
+                    ['oyster', '牡蠣'], ['choice', '選擇'], ['bounce', '彈跳'], ['outdoor', '戶外的'], ['enjoyable', '令人愉快的']
+                ],
+                'Week 3': [
+                    ['whistling', '吹口哨'], ['skipped', '跳過'], ['baked', '烘烤的'], ['copied', '抄寫'], ['planning', '計畫'],
+                    ['stirring', '攪拌'], ['snapped', '折斷'], ['saving', '儲蓄'], ['hurried', '匆忙的'], ['taped', '膠帶黏的'],
+                    ['carried', '攜帶'], ['leaned', '傾斜'], ['used', '使用的'], ['laughs', '笑聲'], ['rushes', '衝向'],
+                    ['copies', '複本'], ['hurries', '匆忙'], ['catches', '抓住'], ['enjoys', '喜歡'], ['passes', '通過'],
+                    ['switches', '開關'], ['says', '說'], ['misses', '想念'], ['wants', '想要'], ['deeper', '更深的'],
+                    ['older', '年長的'], ['warmer', '溫暖的'], ['brightest', '最亮的'], ['longer', '更長的'], ['fastest', '最快的'],
+                    ['tallest', '最高的'], ['lighter', '較輕的'], ['smallest', '最小的'], ['colder', '更冷的'], ['youngest', '最年輕的'],
+                    ['steeper', '更陡的'], ['tightest', '最緊的'], ['clearer', '更清楚的'], ['prettier', '更漂亮的'], ['funnier', '更好笑的'],
+                    ['greatest', '最偉大的'], ['later', '較晚的'], ['shinier', '更亮的'], ['smoothest', '最光滑的'], ['heavy', '重的'],
+                    ['hungriest', '最餓的'], ['prettier', '更漂亮的'], ['ugliest', '最醜的'], ['dizzy', '頭暈的'], ['happier', '更快樂的'],
+                    ['heaviest', '最重的'], ['pretty', '漂亮的'], ['hungrier', '更餓的'], ['drowsiest', '最想睡的'], ['ugly', '醜的'],
+                    ['dizzier', '更暈的'], ['happy', '快樂的'], ['heavier', '更重的'], ['hungry', '飢餓的'], ['prettiest', '最漂亮的'],
+                    ['uglier', '較醜的'], ['drowsy', '想睡的'], ['happiest', '最快樂的'], ['dizziest', '最暈的'], ['chilly', '寒冷的'],
+                    ['empty', '空的'], ['gloomy', '陰沉的'], ['healthy', '健康的'], ['windy', '多風的'], ['San Diego Zoo', '聖地牙哥動物園'],
+                    ['volunteer', '志工'], ['parked', '停好車'], ['zoo lot', '動物園停車場'], ['koala', '無尾熊'], ['highest', '最高的'],
+                    ['Australia', '澳洲'], ['service', '服務'], ['Children’s Zoo', '兒童動物園'], ['local', '當地的'], ['tame animals', '溫馴的動物']
+                ],
+                'Week 4': [
+                    ['lunches', '午餐（複數）'], ['families', '家庭（複數）'], ['turns', '輪流'], ['sandwiches', '三明治'], ['pieces', '片、部分'],
+                    ['parts', '部分'], ['parents', '父母'], ['stories', '故事'], ['boxes', '盒子'], ['dishes', '盤子'],
+                    ['pennies', '一分錢硬幣'], ['teeth', '牙齒'], ['children', '小孩'], ['women', '女人'], ['geese', '鵝'],
+                    ['mice', '老鼠'], ['men', '男人'], ['feet', '腳'], ['deer', '鹿'], ['sheep', '綿羊'],
+                    ['shelves', '架子'], ['loaves', '一條麵包'], ['leaves', '葉子'], ['elves', '精靈'], ['lives', '生命、生活'],
+                    ['calves', '小牛'], ['wolves', '狼'], ['hooves', '蹄'], ['moose', '駝鹿']
+                ],
+                'Week 5': [
+                    ['cat’s', '小貓'], ['babies’', '小寶寶的'], ['mayor’s', '市長的'], ['children’s', '孩子們的'], ['women’s', '女人的'],
+                    ['store’s', '商店的'], ['pupils’', '瞳孔的'], ['workers’', '工人們的'], ['neighbors’', '鄰居們'], ['men’s', '男人們的'],
+                    ['country’s', '國家的'], ['life', '生命'], ['leaves', '葉子'], ['thief', '小偷'], ['loaves', '麵包'],
+                    ['wives', '妻子們'], ['elf', '精靈'], ['scarf', '圍巾'], ['shelves', '架子'], ['lives', '生活'],
+                    ['loaf', '麵包（單）'], ['wolves', '狼'], ['leaf', '葉子'], ['elves', '小精靈'], ['self', '自己'],
+                    ['scarves', '圍巾（複）'], ['wife', '妻子'], ['selves', '自我（複）'], ['shelf', '架子'], ['thieves', '小偷（複）'],
+                    ['wolf', '狼'], ['apatosaurus', '迷惑龍'], ['fisher', '漁夫'], ['geese', '鵝（複）'], ['oxen', '公牛（複）'],
+                    ['women', '女人（複）'], ['vacation', '假期'], ['crowd', '人群'], ['champion', '冠軍'], ['castle builder', '???'],
+                    ['British Columbia', '英屬哥倫比亞'], ['cone-shaped', '圓錐形的'], ['mold', '模型、黴菌'], ['arched', '拱形的'], ['entrance', '入口'],
+                    ['ballroom', '舞廳'], ['tons', '噸、很多'], ['coast', '海岸'], ['masterpiece', '傑作'], ['tide', '潮']
+                ],
+                'Week 6': [
+                    ['hurried', '匆忙的'], ['watches', '手錶、觀看'], ['flipping', '翻轉'], ['later', '之後'], ['skating', '溜冰'],
+                    ['funnier', '更有趣的'], ['inviting', '吸引人的'], ['puppies', '小狗們'], ['mayors', '市長們'], ['foxes', '狐狸們'],
+                    ['leaves', '葉子'], ['benches', '長椅'], ['unhook', '解開鉤子'], ['redo', '重做'], ['unfit', '不適合'],
+                    ['rewind', '倒帶'], ['uncover', '揭開'], ['review', '複習'], ['unfold', '展開'], ['rename', '重新命名'],
+                    ['untie', '解開'], ['reheat', '重新加熱'], ['unfair', '不公平'], ['renew', '更新'], ['unbeaten', '未被擊敗'],
+                    ['remove', '移除'], ['unpaid', '未付的'], ['retake', '再拍、再考'], ['replace', '取代'], ['unfriendly', '不友善的'],
+                    ['rearrange', '重新排列'], ['reappear', '再出現'], ['refinish', '重新完成'], ['reverse', '相反'], ['unequal', '不相等'],
+                    ['unfinished', '未完成'], ['unplanned', '未計畫的']
+                ],
+                'Week 7': [
+                    ['homework', '家庭作業'], ['windmill', '風車'], ['rainfall', '降雨量'], ['snowstorm', '暴風雪'], ['raincoat', '雨衣'],
+                    ['sidewalk', '人行道'], ['toothbrush', '牙刷'], ['somewhere', '某處'], ['storyteller', '說故事的人'], ['weekend', '週末'],
+                    ['wheelbarrow', '獨輪車'], ['snapshot', '快照'], ['cookbook', '食譜'], ['blueberry', '藍莓'], ['footsteps', '腳步聲'],
+                    ['snowplows', '掃雪機'], ['fireplace', '壁爐、火爐'], ['imagination', '想像力'], ['Disneyland', '迪士尼樂園'], ['attractions', '景點'],
+                    ['patterns', '模式、圖案'], ['future', '未來'], ['introduced', '引進、介紹'], ['ahead', '向前'], ['blast off', '發射（火箭）'],
+                    ['motioned', '示意'], ['a park guide', '公園嚮導'], ['galaxy', '星系'], ['thrill', '興奮、刺激'], ['Walt Disney', '華特迪士尼'],
+                    ['fountains', '噴泉']
+                ],
+                // Week 8 在原名單中未提供，故跳過
+                'Week 9': [
+                    ['wasn\'t', '不是（was not）'], ['let\'s', '我們一起（let us）'], ['hadn\'t', '沒有（had not）'], ['won\'t', '不會（will not）'], ['he\'d', '他會（he would）'],
+                    ['wouldn\'t', '不會（would not）'], ['hasn\'t', '沒有（has not）'], ['we\'ll', '我們將會（we will）']
+                ],
+                'Week 10': [
+                    ['poll', '投票'], ['forth', '向前'], ['threw', '丟出（throw 的過去式）'], ['waste', '浪費'], ['beet', '甜菜'],
+                    ['role', '角色'], ['foul', '犯規、骯髒的'], ['minor', '較小的、未成年的'], ['sight', '視力、景象'], ['through', '穿過'],
+                    ['beat', '打、節拍'], ['flower', '花'], ['fourth', '第四'], ['roll', '滾動'], ['fowl', '家禽'],
+                    ['flour', '麵粉'], ['waist', '腰部'], ['pole', '杆子'], ['miner', '礦工'], ['site', '地點'],
+                    ['byte', '位元組'], ['knead', '揉捏（麵團）'], ['need', '需要'], ['principal', '校長、主要的'], ['principle', '原則']
+                ],
+                'Week 11': [
+                    ['distrust', '不信任'], ['pregame', '賽前'], ['mispronounce', '發音錯誤'], ['disconnect', '斷開'], ['displeased', '不高興的'],
+                    ['preheat', '預熱'], ['misread', '誤讀'], ['postrace', '賽後'], ['unpleasant', '不愉快的'], ['disobeyed', '違背的'],
+                    ['postflight', '飛行後'], ['misbehaving', '行為不當'], ['inexpensive', '不昂貴的'], ['restful', '令人放鬆的'], ['wonderful', '美好的'],
+                    ['forgetful', '健忘的'], ['useless', '無用的'], ['endless', '無盡的'], ['cloudless', '無雲的'], ['rusty', '生鏽的'],
+                    ['squeaky', '吱吱響的'], ['dusty', '灰塵多的'], ['neatly', '整齊地'], ['loudly', '大聲地'], ['quickly', '快速地'],
+                    ['successful', '成功的'], ['theory', '理論'], ['assignment', '作業'], ['lower', '較低的'], ['designs', '設計'],
+                    ['damage', '損壞'], ['improvement', '改進'], ['compared', '比較'], ['glider', '滑翔機'], ['theory', '理論'],
+                    ['classmates', '同學'], ['favorite subject', '最喜愛的科目'], ['straight', '直的'], ['facts', '事實']
+                ],
+                'Week 12': [
+                    ['problem', '問題'], ['woman', '女人'], ['season', '季節'], ['happen', '發生'], ['custom', '習俗'],
+                    ['even', '甚至'], ['bottom', '底部'], ['garden', '花園'], ['person', '人'], ['mitten', '手套'],
+                    ['cannon', '大砲'], ['eleven', '十一'], ['lesson', '課程'], ['button', '按鈕'], ['kitten', '小貓'],
+                    ['reason', '理由'], ['ribbon', '緞帶'], ['dragon', '龍'], ['horizon', '地平線'], ['crimson', '深紅色'],
+                    ['dolphin', '海豚'], ['dungeon', '地牢'], ['opinion', '意見'], ['watermelon', '西瓜']
+                ],
+                'Week 13': [
+                    ['barely', '幾乎不'], ['lively', '活潑的'], ['lonely', '寂寞的'], ['freely', '自由地'], ['frankly', '坦白地'],
+                    ['harshly', '嚴厲地'], ['quickly', '快速地'], ['eagerly', '渴望地'], ['suddenly', '突然地'], ['totally', '完全地'],
+                    ['willingly', '願意地'], ['angrily', '生氣地'], ['happily', '快樂地'], ['luckily', '幸運地'], ['merrily', '愉快地'],
+                    ['noisily', '吵鬧地'], ['sleepily', '昏昏欲睡地'], ['speedily', '迅速地'], ['steadily', '穩定地'], ['sturdily', '結實地'],
+                    ['calmly', '冷靜地'], ['cowardly', '懦弱地'], ['personally', '親自地'], ['secretly', '秘密地'], ['usually', '通常地'],
+                    ['volcano', '火山'], ['helicopter', '直升機'], ['scientist', '科學家'], ['crater', '火山口'], ['shifting', '移動中的'],
+                    ['trapped', '被困住的'], ['pressure', '壓力'], ['explosion', '爆炸'], ['bomb', '炸彈'], ['mountaintop', '山頂'],
+                    ['boiling water', '沸騰的水'], ['lava', '熔岩'], ['ash', '灰燼'], ['degrees', '度數'], ['ferns', '蕨類植物']
+                ],
+                'Week 14': [
+                    ['viewers', '觀眾'], ['hogs', '豬'], ['hog-calling contest', '比賽'], ['company', '公司'], ['Venice', '威尼斯'],
+                    ['Florida', '佛羅里達'], ['juggling', '雜耍'], ['however', '然而'], ['glanced', '瞥見'], ['guarantee', '保證'],
+                    ['hired', '雇用'], ['stunts', '特技'], ['mime', '默劇演員'], ['makeup', '化妝'], ['perform', '表演'],
+                    ['serious', '認真的']
+                ],
+                'Week 15': [
+                    ['condition', '狀況'], ['pasture', '牧場'], ['action', '行動'], ['failure', '失敗'], ['feature', '特徵'],
+                    ['nation', '國家'], ['nature', '自然'], ['mention', '提及'], ['posture', '姿勢'], ['station', '車站'],
+                    ['picture', '圖片'], ['motion', '動作'], ['creature', '生物'], ['caption', '標題文字'], ['furniture', '家具'],
+                    ['lotion', '乳液'], ['caution', '小心'], ['question', '問題'], ['location', '地點'], ['direction', '方向'],
+                    ['attention', '注意'], ['creation', '創造'], ['departure', '離開'], ['lecture', '講課'], ['moisture', '濕氣'],
+                    ['scooped', '舀起'], ['snorkeling', '浮潛'], ['snorkel', '呼吸管'], ['handful', '一把'], ['typical', '典型的'],
+                    ['coral', '珊瑚'], ['envelopes', '信封'], ['flippers', '蛙鞋'], ['mouthful', '一口的量'], ['outer space', '外太空'],
+                    ['facedown', '俯臥'], ['creature', '生物']
+                ],
+                'Week 16': [
+                    ['acre', '英畝'], ['appeal', '申訴'], ['appreciate', '感激'], ['backstage', '幕後'], ['binoculars', '雙筒望遠鏡'],
+                    ['characters', '角色'], ['disgust', '厭惡'], ['nature', '自然'], ['preserve', '保存'], ['wildlife', '野生動物'],
+                    ['wrinkle', '皺紋']
+                ],
+                'Week 17': [
+                    ['astronaut', '太空人'], ['check in', '登記、報'], ['gravity', '重力'], ['launch', '發射'], ['model', '模型、模範'],
+                    ['spacecraft', '太空船'], ['nearby', '附近的'], ['stick up', '豎起、挺立'], ['overhear', '無意間聽到'], ['stuff', '東西、物品'],
+                    ['screen', '螢幕']
+                ],
+                'Week 18': [
+                    ['demonstrate', '示範'], ['mask', '面具'], ['surround', '包圍'], ['float', '漂浮'], ['micro', '微小的'],
+                    ['weightlessness', '失重'], ['giggle', '咯咯笑'], ['steady', '穩定的'], ['lower', '較低的'], ['strap', '皮帶']
+                ]
             };
 
             // 擴充版貼紙庫 (60 items)
@@ -313,18 +442,17 @@
             };
 
             function saveGame() {
-                localStorage.setItem('pierceSpellAdventure_v3', JSON.stringify(gameState));
+                // 使用新的 key: allenSpellAdventure_v1 以區分使用者
+                localStorage.setItem('allenSpellAdventure_v1', JSON.stringify(gameState));
                 updateUI();
             }
 
             function loadGame() {
-                let saved = localStorage.getItem('pierceSpellAdventure_v3');
-                if (!saved) saved = localStorage.getItem('pierceSpellAdventure');
+                let saved = localStorage.getItem('allenSpellAdventure_v1');
 
                 if(saved) {
                     const parsed = JSON.parse(saved);
                     gameState = { ...gameState, ...parsed }; 
-                    // 修復舊版 ID
                     if(gameState.activeTheme.includes('_')) {
                         gameState.activeTheme = gameState.activeTheme.replace('_', '-');
                     }
